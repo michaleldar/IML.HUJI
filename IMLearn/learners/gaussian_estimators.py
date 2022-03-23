@@ -3,6 +3,22 @@ import numpy as np
 from numpy.linalg import inv, det, slogdet
 
 
+def univariate_normal_pdf(sample, mu, sigma):
+    """
+    calculates normal PDF with self parameters of mu and var
+    """
+    return ((1 / (sigma * np.sqrt(2 * np.pi))) *
+            (np.exp((- 1 / 2) * (((sample - mu) / sigma) ** 2))))
+
+
+def multivariate_normal_pdf(sample, mu, cov):
+    """
+    calculates normal PDF with self parameters of mu and var
+    """
+    return ((1 / (cov * np.sqrt(((2 * np.pi) ** len(sample)) * np.linalg.det(cov)))) *
+            (np.exp((- 1 / 2) * (np.matmul(np.matmul(sample - mu, np.linalg.inv(cov)), sample - mu)))))
+
+
 class UnivariateGaussian:
     """
     Class for univariate Gaussian Distribution Estimator
@@ -51,8 +67,19 @@ class UnivariateGaussian:
         Sets `self.mu_`, `self.var_` attributes according to calculated estimation (where
         estimator is either biased or unbiased). Then sets `self.fitted_` attribute to `True`
         """
-        raise NotImplementedError()
+        mu = X.mean()
+        
+        sum = 0
+        for sample in X:
+            sum += (sample - mu)**2
 
+        if self.biased_:
+            var = sum / X.size
+        else:
+            var = sum / (X.size - 1)
+           
+        self.mu_ = mu
+        self.var_ = var
         self.fitted_ = True
         return self
 
@@ -76,7 +103,12 @@ class UnivariateGaussian:
         """
         if not self.fitted_:
             raise ValueError("Estimator must first be fitted before calling `pdf` function")
-        raise NotImplementedError()
+
+        samples_normal_values = []
+        for sample in X:
+            samples_normal_values.append(univariate_normal_pdf(sample, self.mu_, np.sqrt(self.var_)))
+
+        return np.array(samples_normal_values)
 
     @staticmethod
     def log_likelihood(mu: float, sigma: float, X: np.ndarray) -> float:
@@ -97,7 +129,7 @@ class UnivariateGaussian:
         log_likelihood: float
             log-likelihood calculated
         """
-        raise NotImplementedError()
+        return sum(map(lambda x: np.log(univariate_normal_pdf(x, mu, sigma)), X))
 
 
 class MultivariateGaussian:
@@ -125,6 +157,12 @@ class MultivariateGaussian:
         self.mu_, self.cov_ = None, None
         self.fitted_ = False
 
+    def _calculate_covariance(self, X: np.ndarray, i, j):
+        sum = 0
+        for k in range(len(X)):
+            sum += ((X[k][i] - self.mu_[i])*(X[k][j] - self.mu_[j]))
+        return float(sum) / (len(X) - 1)
+
     def fit(self, X: np.ndarray) -> MultivariateGaussian:
         """
         Estimate Gaussian expectation and covariance from given samples
@@ -143,7 +181,12 @@ class MultivariateGaussian:
         Sets `self.mu_`, `self.cov_` attributes according to calculated estimation.
         Then sets `self.fitted_` attribute to `True`
         """
-        raise NotImplementedError()
+        self.mu_ = np.mean(X, axis=0)
+        self.cov_ = np.empty((len(X[0]), len(X[0])), float)
+
+        for i in range(len(X[0])):
+            for j in range(len(X[0])):
+                self.cov_[i][j] = self._calculate_covariance(X, i, j)
 
         self.fitted_ = True
         return self
@@ -168,7 +211,12 @@ class MultivariateGaussian:
         """
         if not self.fitted_:
             raise ValueError("Estimator must first be fitted before calling `pdf` function")
-        raise NotImplementedError()
+
+        samples_normal_values = []
+        for sample in X:
+            samples_normal_values.append(multivariate_normal_pdf(sample, self.mu_, self.cov_))
+
+        return np.array(samples_normal_values)
 
     @staticmethod
     def log_likelihood(mu: np.ndarray, cov: np.ndarray, X: np.ndarray) -> float:
@@ -189,4 +237,14 @@ class MultivariateGaussian:
         log_likelihood: float
             log-likelihood calculated
         """
-        raise NotImplementedError()
+        samples_dimension = len(X[0])
+        num_of_samples = len(X)
+        first = (((samples_dimension * num_of_samples) / 2) * np.log(2 * np.pi))
+        second = ((num_of_samples / 2) * np.log(np.linalg.det(cov)))
+        third = 0
+
+        inv_cov = np.linalg.inv(cov)
+        for i in range(len(X)):
+            third += (np.matmul(np.matmul(X[i] - mu, inv_cov), X[i] - mu) / 2)
+
+        return - first - second - third
