@@ -5,7 +5,7 @@ from numpy.linalg import inv, det, slogdet
 
 def univariate_normal_pdf(sample, mu, sigma):
     """
-    calculates normal PDF with self parameters of mu and var
+    calculates normal PDF with given parameters of mu and var
     """
     return ((1 / (sigma * np.sqrt(2 * np.pi))) *
             (np.exp((- 1 / 2) * (((sample - mu) / sigma) ** 2))))
@@ -13,7 +13,7 @@ def univariate_normal_pdf(sample, mu, sigma):
 
 def multivariate_normal_pdf(sample, mu, cov):
     """
-    calculates normal PDF with self parameters of mu and var
+    calculates normal PDF with given parameters of mu and var
     """
     return ((1 / (cov * np.sqrt(((2 * np.pi) ** len(sample)) * np.linalg.det(cov)))) *
             (np.exp((- 1 / 2) * (np.matmul(np.matmul(sample - mu, np.linalg.inv(cov)), sample - mu)))))

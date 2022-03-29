@@ -34,9 +34,9 @@ def test_univariate_gaussian():
                           xaxis_title="Number of samples",
                           yaxis_title="Absolute distance |estimates - true value|",
                           height=450)).show()
+
     # # Question 3 - Plotting Empirical PDF of fitted model
     samples_normal_vals = u.pdf(samples)
-
     go.Figure([go.Scatter(x=samples, y=samples_normal_vals, mode='markers',
                           name=r'$\widehat\mu$'),
                ], layout=go.Layout(barmode='overlay',
