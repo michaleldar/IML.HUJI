@@ -115,4 +115,4 @@ class GaussianNaiveBayes(BaseEstimator):
         loss : float
             Performance under missclassification loss function
         """
-        return misclassification_error(y, self._predict(X))
+        raise NotImplementedError()
