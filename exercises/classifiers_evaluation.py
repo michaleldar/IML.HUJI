@@ -54,7 +54,6 @@ def run_perceptron():
         losses = []
         perceptron = Perceptron(callback=callback_func)
         perceptron.fit(X, y)
-        print(losses)
 
         # Plot figure
         go.Figure([go.Scatter(x=list(range(len(losses))), y=losses, mode='markers+lines', name=n)],
@@ -121,7 +120,7 @@ def compare_gaussian_classifiers():
         fig = make_subplots(rows=1, cols=2, subplot_titles=[rf"$\textbf{{Model: {model_names[idx]} Accuracy: {accuracy(y, y_pred)}}}$" for idx, y_pred in enumerate(ys)],
                             horizontal_spacing=0.01, vertical_spacing=.03)
         for i, m in enumerate(ys):
-            fig.add_traces([utils.decision_surface(modles_prediction[i], lims[0], lims[1], showscale=False),
+            fig.add_traces([
                             go.Scatter(x=X[:, 0], y=X[:, 1], mode="markers", showlegend=False,
                                        marker=dict(color=ys[i], symbol=symbols[y.astype(int)],
                                                    colorscale=[[0.1111111111111111, "rgb(215,48,39)"],

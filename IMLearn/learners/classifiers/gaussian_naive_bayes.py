@@ -46,13 +46,16 @@ class GaussianNaiveBayes(BaseEstimator):
         self.classes_ = k_classes_values
         self.pi_ = k_classes_count / y.shape[0]
 
-        n_features = X.shape[1]
+        if (len(X.shape) > 1):
+            n_features = X.shape[1]
+        else:
+            n_features = 1
         mu_array = np.zeros((k_classes_values.shape[0], n_features))
         var_array = np.zeros((k_classes_values.shape[0], n_features))
         for idx, class_k in enumerate(self.classes_):
             X_k = X[y == class_k]
             mu_array[idx] = np.mean(X_k, axis=0)
-            var_array[idx] = np.var(X_k, axis=0)
+            var_array[idx] = np.var(X_k, axis=0, ddof=1)
         self.vars_ = var_array
         self.mu_ = mu_array
         self.fitted_ = True
@@ -115,4 +118,4 @@ class GaussianNaiveBayes(BaseEstimator):
         loss : float
             Performance under missclassification loss function
         """
-        raise NotImplementedError()
+        return misclassification_error(y, self._predict(X))
