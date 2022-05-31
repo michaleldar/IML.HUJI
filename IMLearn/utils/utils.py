@@ -39,7 +39,7 @@ def split_train_test(X: pd.DataFrame, y: pd.Series, train_proportion: float = .2
     all_data[y_name] = y
     training_part_all_data = all_data.sample(frac=train_proportion)
     test_part_all_data = all_data.drop(training_part_all_data.index)
-    #
+
     training_part_y = training_part_all_data.loc[:, y_name]
     test_part_y = test_part_all_data.loc[:, y_name]
 
