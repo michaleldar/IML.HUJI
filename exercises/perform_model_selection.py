@@ -97,11 +97,13 @@ def select_regularization_parameter(n_samples: int = 50, n_evaluations: int = 50
     """
     # Question 6 - Load diabetes dataset and split into training and testing portions
     X, y = datasets.load_diabetes(return_X_y=True)
-    train_X, train_y, test_X, text_y = split_train_test(pd.DataFrame(X), pd.Series(y, name="y"), train_proportion=0.5)
+    # train_X, train_y, test_X, text_y = split_train_test(pd.DataFrame(X), pd.Series(y, name="y"), train_proportion=0.5)
+    train_X, test_X = X[: n_samples], X[n_samples:]
+    train_y, test_y = y[: n_samples], y[n_samples:]
 
 
     # Question 7 - Perform CV for different values of the regularization parameter for Ridge and Lasso regressions
-    lam_range = np.linspace(0, 3, 500)
+    lam_range = np.linspace(0.001, 3, 500)
     ridge_errors = []
     lasso_errors = []
     for lam in lam_range:

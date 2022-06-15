@@ -46,5 +46,6 @@ def cross_validate(estimator: BaseEstimator, X: np.ndarray, y: np.ndarray,
         estimator.fit(xy_concatenated[:, :-1], xy_concatenated[:, -1])
         train_scores_sum += scoring(estimator.predict(xy_concatenated[:, :-1]),
                                      xy_concatenated[:, -1])
+        # test_scores_sum += scoring(estimator.predict(validations[k][:, :-1]), validations[k][:, -1])
         test_scores_sum += scoring(estimator.predict(validations[k][:, :-1]), validations[k][:, -1])
-    return float(train_scores_sum) / cv, float(test_scores_sum) / cv
+    return train_scores_sum / cv, test_scores_sum / cv

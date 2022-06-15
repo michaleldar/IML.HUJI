@@ -64,8 +64,10 @@ class RidgeRegression(BaseEstimator):
         if self.include_intercept_:
             np.insert(X, 0, 1, axis=1)
         id_mat = np.identity(X.shape[1])
-        id_mat[0][0] = 0
-        self.coefs_ = np.linalg.inv(X.T @ X + self.lam_ * np.identity(X.shape[1])) @ X.T @ y
+        if self.include_intercept_:
+            id_mat[0][0] = 0
+        # self.coefs_ = np.linalg.inv((X.T @ X) + self.lam_ * id_mat) @ X.T @ y
+        self.coefs_ = np.matmul(np.matmul(np.linalg.inv((np.matmul(X.T, X)) + self.lam_ * id_mat), X.T), y)
         self.fitted_ = True
 
     def _predict(self, X: np.ndarray) -> np.ndarray:
@@ -84,7 +86,8 @@ class RidgeRegression(BaseEstimator):
         """
         if self.include_intercept_:
             np.insert(X, 0, 1, axis=1)
-        return X @ self.coefs_
+        # return X @ self.coefs_
+        return np.matmul(X, self.coefs_)
 
     def _loss(self, X: np.ndarray, y: np.ndarray) -> float:
         """
